@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>For You</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-family: 'Cormorant Garamond', serif;
+      color: #f5e6d3;
+      padding: 20px;
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .container {
+      max-width: 620px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 50px 40px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 10;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      margin-bottom: 30px;
+      color: #ffd6e0;
+      font-weight: 500;
+    }
+
+    .message {
+      font-size: 1.35rem;
+      line-height: 1.8;
+      margin-bottom: 40px;
+      color: #f8e9e0;
+    }
+
+    .poem {
+      font-size: 1.25rem;
+      line-height: 1.9;
+      font-style: italic;
+      color: #e8d5c4;
+      border-top: 1px solid rgba(255, 214, 224, 0.25);
+      padding-top: 35px;
+      margin-top: 10px;
+    }
+
+    .heart-icon {
+      font-size: 2rem;
+      margin: 25px 0;
+      opacity: 0.8;
+    }
+
+    .locked {
+      font-size: 1.4rem;
+      color: #c9b8a8;
+      line-height: 1.7;
+    }
+
+    .loading {
+      font-size: 1.2rem;
+      color: #c9b8a8;
+    }
+
+    /* Floating hearts */
+    .heart {
+      position: fixed;
+      bottom: -50px;
+      color: #ff6b8b;
+      font-size: 20px;
+      animation: floatUp linear forwards;
+      pointer-events: none;
+      z-index: 1;
+      text-shadow: 0 0 10px rgba(255, 107, 139, 0.6);
+      opacity: 0.85;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(1);
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(-110vh) rotate(720deg) scale(0.6);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="content">
+    <p class="loading">Loading...</p>
+  </div>
+
+  <script>
+    // Opens: 2 November 2026 00:00 UTC
+    // Closes: 3 November 2026 00:00 UTC
+    const openDate = new Date(Date.UTC(2026, 10, 2, 0, 0, 0));
+    const closeDate = new Date(Date.UTC(2026, 10, 3, 0, 0, 0));
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.innerHTML = '♥';
+
+      const size = Math.random() * 22 + 12;
+      heart.style.fontSize = size + 'px';
+      heart.style.left = Math.random() * 100 + 'vw';
+
+      const duration = Math.random() * 4 + 5;
+      heart.style.animationDuration = duration + 's';
+      heart.style.animationDelay = Math.random() * 1 + 's';
+      heart.style.opacity = Math.random() * 0.5 + 0.4;
+
+      const colors = ['#ff6b8b', '#ff8fab', '#ffb3c6', '#ff4d6d', '#e83e8c'];
+      heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+      document.body.appendChild(heart);
+
+      setTimeout(() => {
+        heart.remove();
+      }, (duration + 1) * 1000);
+    }
+
+    function startHearts() {
+      setInterval(createHeart, 320);
+      for (let i = 0; i < 8; i++) {
+        setTimeout(createHeart, i * 200);
+      }
+    }
+
+    async function checkTimeAndShow() {
+      const content = document.getElementById('content');
+
+      try {
+        const response = await fetch('https://worldtimeapi.org/api/timezone/Etc/UTC');
+        const data = await response.json();
+        const now = new Date(data.datetime);
+
+        if (now >= openDate && now < closeDate) {
+          // SHOW THE BIRTHDAY MESSAGE
+          content.innerHTML = `
+            <h1>Happy Birthday, My Love</h1>
+            
+            <div class="message">
+              Hey my love.<br><br>
+              Happy birthday.<br>
+              I don’t know how my life would be without you in it sometimes.<br>
+              I love you deeply and I always will.<br>
+              You’re my everything.
+            </div>
+
+            <div class="heart-icon">♡</div>
+
+            <div class="poem">
+              On this day the world got brighter,<br>
+              Because you were born and made it lighter.<br>
+              Every breath I take feels true,<br>
+              Only because I’m breathing with you.<br><br>
+              You are the calm inside my storm,<br>
+              The quiet place that keeps me warm.<br>
+              No matter where this life may lead,<br>
+              You’re still the only one I need.<br><br>
+              Happy birthday, my love, my home, my peace —<br>
+              My favourite reason the chaos can cease.
+            </div>
+          `;
+          startHearts(); // Only start hearts when the message is visible
+        } else {
+          // LOCKED STATE
+          content.innerHTML = `
+            <p class="locked">
+              This page is not available yet.<br><br>
+              It will open on <strong>2 November</strong>.
+            </p>
+          `;
+        }
+      } catch (error) {
+        content.innerHTML = `<p class="locked">Unable to check the time right now.<br>Please try again later.</p>`;
+      }
+    }
+
+    checkTimeAndShow();
+  </script>
+</body>
+</html>
